@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin="">
+        </script>
+    <style>
+        #map {
+            height: 800px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([28.768279,104.644803], 13);
+
+        L.tileLayer("http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",{
+                    attribution: '&copy; 高德地图',
+                    maxZoom: 19,
+                    minZoom: 3,
+                    subdomains: "1234"
+                }).addTo(map);
+        // 定位到当前位置 setView 如果找地图失败 会给你显示整个世界
+
+        // 一种geoJSON数据
+        var geojsonFeature = {
+            // type是类型 有线 有点 有特征 还可以传函数进去
+            "type": "Feature",
+            "properties": {
+                "name": "Coors Field",
+                "amenity": "Baseball Stadium",
+                "popupContent": "This is where the Rockies play!"
+            },
+            "geometry": {
+                "type":'Polygon',
+                "coordinates":[[
+                    [104.669452,28.812597],
+                    [104.674411,28.808387],
+                    [104.682747,28.812818],
+                    [104.678489,28.817692]
+                ]]
+            }
+        };
+        L.geoJSON(geojsonFeature).addTo(map);
+
+        // 表示了两条线 从宜宾到重庆
+        var myLines = [{
+            "type": "LineString",
+            "coordinates": [[104.645665,28.760427], [106.568183,29.591964]]
+        }];
+        // 给线添加样式
+        L.geoJSON(myLines,{
+            style:{
+                color:'red',
+                weight:'5',
+                opacity:0.55
+            }
+        }).addTo(map);
+        var states={
+            "type":"Feature",
+            "properties":{
+                "party":"SUSE"
+            },
+            "geometry":{
+                "type":'Polygon',
+                "coordinates":[[
+                    [104.660793,28.806536],
+                    [104.671141,28.799129],
+                    [104.677573,28.802928],
+                    [104.673513,28.813023]
+                    
+                ]]
+            }
+        }
+        // 可以通过函数调用属性从而给图层改变样式
+        L.geoJSON(states,{
+            style:function(feature){
+                switch(feature.properties.party){
+                    case 'SUSE':return {color:"#ff0000"}
+                }
+            }
+        }).addTo(map)
+    </script>
+</body>
+
+</html>

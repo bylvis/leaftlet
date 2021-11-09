@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin="">
+        </script>
+    <style>
+        #map {
+            height: 800px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([28.768279, 104.644803], 13);
+
+        L.tileLayer("http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}", {
+            attribution: '&copy; 高德地图',
+            maxZoom: 19,
+            minZoom: 3,
+            subdomains: "1234"
+        }).addTo(map);
+
+        // 点类型的geoJSON
+        var states = {
+            "type": "Feature",
+            "properties": {
+                "name": "Coors Field",
+                "amenity": "Baseball Stadium",
+                "popupContent": "This is where the Rockies play!"
+            },
+            "geometry": {
+                "type": 'Point',
+                "coordinates": [104.644803, 28.768279]
+            }
+        }
+        // 设置标记的样式
+        var someStyle = {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+
+        // 把点放上去
+        // L.geoJSON(states, {
+        //     pointToLayer: function (feature, latlng) {
+        //         return L.circleMarker(latlng, someStyle)
+        //     }
+        // }).addTo(map)
+
+        L.geoJSON(states, {
+            onEachFeature: onEachFeature,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, someStyle)
+            }
+        }).addTo(map)
+
+        function onEachFeature(feature, layer) {
+            // does this feature have a property named popupContent?
+            if (feature.properties && feature.properties.popupContent) {
+                layer.bindPopup(feature.properties.popupContent);
+            }
+        }
+    </script>
+</body>
+
+</html>
