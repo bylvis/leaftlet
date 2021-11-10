@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin="">
+        </script>
+    <script src="./source/us-states.js"></script>
+    <style>
+        #map {
+            height: 680px;
+            /* background-color: aqua; */
+        }
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        // 绘制地图
+        var mapboxAccessToken = 'pk.eyJ1IjoiYmFpeXVsb25nIiwiYSI6ImNrdnJzczBnd2F4NmYybnM3cDQxNmVmYjUifQ.8_3b5GgzWBtkEVBvBclzQQ';
+        var map = L.map('map').setView([37.8, -96], 5);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapboxAccessToken, {
+            id: 'mapbox/light-v9',
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            tileSize: 512,
+            zoomOffset: -1
+        }).addTo(map);
+
+
+        var popup = L.popup();
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+        map.on('click', onMapClick);
+
+        // 画图
+        var myLayer = L.geoJson(statesData, {
+            style: style,
+            onEachFeature:onEachFeature
+        }).addTo(map);
+        
+        //  创建地图上的控制组件
+        var info = L.control();
+        // 想控制组件里面添加DOM元素
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            this.update();
+            return this._div;
+        };
+
+        // method that we will use to update the control based on feature properties passed
+        info.update = function (props) {
+            this._div.innerHTML = '<h4>US Population Density</h4>' +  (props ?
+                '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
+                : 'Hover over a state');
+        };
+
+        info.addTo(map);
+        // 创建图例控件
+        var legend = L.control({position: 'bottomright'});
+        legend.onAdd = function(map){
+            var div = L.DomUtil.create('div','info legend'),
+            grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+            labels = [];
+            // 循环创建i标签 动态添加背景颜色
+            for (var i = 0; i < grades.length; i++) {
+                    div.innerHTML += 
+                    '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' 
+                    + grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+            return div;
+        }
+        legend.addTo(map);
+        // 通过函数根据geoJSON数据里的面积属性 来进行颜色分层
+        function getColor(d) {
+            return d > 1000 ? '#800026' :
+                   d > 500  ? '#BD0026' :
+                   d > 200  ? '#E31A1C' :
+                   d > 100  ? '#FC4E2A' :
+                   d > 50   ? '#FD8D3C' :
+                   d > 20   ? '#FEB24C' :
+                   d > 10   ? '#FED976' :
+                              '#FFEDA0';
+        }
+        // style函数给地图添加样式
+        function style(feature){
+            return{
+                fillColor:getColor(feature.properties.density),
+                weight:2,
+                opacity:1,
+                color:'white',
+                dashArray: '5',
+                fillOpacity: 0.7
+            }
+        }
+        // 高亮图层
+        function highlightFeature(e){
+            var layer = e.target;
+            layer.setStyle({
+                weight:5,
+                color:'#666',
+                dashArray:'',
+                fillOpacity:0.7
+            });
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                layer.bringToFront();
+            }
+            info.update(layer.feature.properties);
+        }
+        // 重置图层
+        function resetHighlight(e) {
+            myLayer.resetStyle(e.target);
+            info.update()
+        }
+        // 缩放到某个状态
+        function zoomToFeature(e) {
+           map.fitBounds(e.target.getBounds());
+        }
+        // 事件都放到onEachFeature里面去初始化
+        function onEachFeature(feature, layer) {
+            layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: zoomToFeature
+        }); 
+        }   
+    </script>
+</body>
+
+</html>

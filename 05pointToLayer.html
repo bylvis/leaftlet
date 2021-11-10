@@ -68,7 +68,7 @@
                 return L.circleMarker(latlng, someStyle)
             }
         }).addTo(map)
-
+        // 每个节点信息弹出
         function onEachFeature(feature, layer) {
             // does this feature have a property named popupContent?
             if (feature.properties && feature.properties.popupContent) {

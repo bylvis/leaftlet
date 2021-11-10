@@ -82,9 +82,91 @@
     }).addTo(map)
 
     4.绘制标记点 geoJSON是点类型的 可以通过pointToLayer来绘制
-    L.geoJSON(states, {
+   
+## onEachFeature 
+    onEachFeature是一个函数，在将每个特性添加到geoJson图层之前会调用
+    定义onEachFeature函数 给弹出层绑定geojson数据的特征
+    function onEachFeature(feature, layer) {
+    // does this feature have a property named popupContent?
+    if (feature.properties && feature.properties.popupContent) {
+            layer.bindPopup(feature.properties.popupContent);
+        }
+    }
+    加载图层的特征
+     L.geoJSON(states, {
             onEachFeature: onEachFeature,
             pointToLayer: function (feature, latlng) {
                 return L.circleMarker(latlng, someStyle)
             }
         }).addTo(map)
+## 过滤器
+    过滤掉用户不想展示的部分 接受的值是布尔类型
+     L.geoJSON(someFeatures, {
+            filter: function (feature, layer) {
+                return feature.properties.show_map
+            }
+    }).addTo(map)
+
+## 通过监听事件给地图设置hover以及mouseout移除hover的效果
+    var layer = e.target
+    将当前事件的宿主设置颜色
+    layer.setStyle({
+                weight:5,
+                color:'#666',
+                dashArray:'',
+                fillOpacity:0.7
+            });
+    移除高亮
+    function resetHighlight(e) {
+            重置图层
+            myLayer.resetStyle(e.target);
+        }
+    点击放大 
+    function zoomToFeature(e) {
+           map.fitBounds(e.target.getBounds());
+        }
+    所有事件统一到onEachFeature里面 加载开头统一添加事件
+    function onEachFeature(feature, layer) {
+            layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: zoomToFeature
+        }); 
+## 在地图里面添加控件
+    创建控件
+    1.var info = L.control();
+    2.向控制组件里面添加DOM元素 并且赋予类名
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+        this.update();
+        return this._div;
+    };
+    3.给控件添加方法 接收geo的数据 更新控件
+    info.update = function (props) {
+            this._div.innerHTML = '<h4>US Population Density</h4>' +  (props ?
+                '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
+                : 'Hover over a state');
+        };
+    4.把控件添加到map里面
+     info.addTo(map);
+    5.在每次触发悬停事件的时候需要调用控件方法
+## 创建带有图例的控件
+    动态添加dom以及动态添加dom属性样式即可
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function(map){
+            var div = L.DomUtil.create('div','info legend'),
+            grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+            labels = [];
+            // 循环创建i标签 动态添加背景颜色
+            for (var i = 0; i < grades.length; i++) {
+                    div.innerHTML += 
+                    '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' 
+                    + grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+            return div;
+        }
+    legend.addTo(map);
+## 图层控制
+    1.互斥的基础层
+    
+    2.覆盖层
