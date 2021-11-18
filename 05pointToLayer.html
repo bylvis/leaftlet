@@ -45,6 +45,17 @@
                 "coordinates": [104.644803, 28.768279]
             }
         }
+        var myline = [{
+            "type":"LineString",
+            "coordinates":[[104.68979,28.825508], [104.624825,28.758147]]
+        }]
+        L.geoJSON(myline, {
+            style:{
+                color:'red',
+                opacity:0.5
+            }
+            
+        }).addTo(map)
         // 设置标记的样式
         var someStyle = {
             radius: 8,

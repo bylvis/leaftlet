@@ -13,6 +13,7 @@
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin="">
         </script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0"></script>
     <style>
         #map {
             height: 880px;
@@ -24,22 +25,20 @@
 <body>
     <div id="map"></div>
     <script>
-        // 绘制地图
         
         
         var littleton = L.marker([28.81323,104.671249]).bindPopup('This is Littleton, CO.'),
             denver    = L.marker([28.817154,104.685766]).bindPopup('This is Denver, CO.'),
             aurora    = L.marker([28.807659,104.694246]).bindPopup('This is Aurora, CO.'),
             golden    = L.marker([28.823863,104.699995]).bindPopup('This is Golden, CO.');
+        
         var cities = L.layerGroup([littleton, denver, aurora, golden]);
-        var grayscale = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            // 灰度id
-            id: 'mapbox/light-v9',
-            tileSize: 512,
-            zoomOffset: -1,
-            accessToken: 'pk.eyJ1IjoiYmFpeXVsb25nIiwiYSI6ImNrdnJzczBnd2F4NmYybnM3cDQxNmVmYjUifQ.8_3b5GgzWBtkEVBvBclzQQ'
+
+        var Gaode = L.tileLayer("http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}", {
+            attribution: '&copy; 高德地图',
+            maxZoom: 19,
+            minZoom: 3,
+            subdomains: "1234"
         })
         
 
@@ -55,11 +54,13 @@
         var map = L.map('map', {
             center: [28.801962, 104.667649],
             zoom: 13,
-            layers: [grayscale, cities]
+            layers: [Gaode, cities]
         });
+
         var baseMaps = {
-            "Streets": street,
-            "Grayscale": grayscale
+            "mapbox地图": street,
+            "高德地图": Gaode,
+            '测试高德': gaodemap
         };
 
         var overlayMaps = {

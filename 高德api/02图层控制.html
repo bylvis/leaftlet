@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0"></script>
+    <style>
+        #container {
+            width: 500px;
+            height: 380px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+
+    </div>
+    <script>
+        var map = new AMap.Map('container')
+        var layer1 = [
+            new AMap.TileLayer.Satellite(),
+            // new AMap.TileLayer.RoadNet()
+        ]
+        var layer2 = [
+            // new AMap.TileLayer.Satellite(),
+            new AMap.TileLayer.RoadNet()
+        ]
+        map.setLayers(layer1);
+        map.setLayers(layer2);
+        // 图层是一个数组
+        console.log(map.getLayers);
+        // map.remove(layers);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <title>Document</title>
+    <script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0"></script>
+    <style>
+        #container {
+            width: 500px;
+            height: 380px;
+        }
+
+        #container1 {
+            width: 500px;
+            height: 380px;
+        }
+
+        #container2 {
+            width: 500px;
+            height: 380px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <div id="container1"></div>
+    <div id="container2"></div>
+    <script>
+        var map = new AMap.Map('container');
+        var map3D = new AMap.Map('container1', {
+            zoom: 11,//级别
+            center: [116.397428, 39.90923],//中心点坐标
+            viewMode: '3D'//使用3D视图
+        });
+        var trafficLayer = new AMap.TileLayer.Traffic({
+            zIndex: 10
+        });
+        map.add(trafficLayer)
+
+        var map1 = new AMap.Map('container2', {
+            center: [116.397428, 39.90923],
+            layers: [//使用多个图层
+                new AMap.TileLayer.Satellite(),
+                new AMap.TileLayer.RoadNet()
+            ],
+            zooms: [4, 18],//设置地图级别范围
+            zoom: 13
+        });
+        map.plugin(["AMap.MapType"], function () {
+            //地图类型切换
+            var type = new AMap.MapType({
+                defaultType: 0 //使用2D地图
+            });
+            map.addControl(type);
+        });
+    </script>
+</body>
+
+</html>

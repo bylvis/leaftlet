@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0"></script>
+    <style>
+        #container {
+            width: 500px;
+            height: 380px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+
+    </div>
+    <script>
+        var map = new AMap.Map('container', {
+            mapStyle: 'amap://styles/b4c38ba1325cca58d0712a4983398fcd', //设置地图的显示样式
+        });
+    </script>
+</body>
+
+</html>
