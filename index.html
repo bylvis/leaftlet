@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0"></script>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="./color_change.js"></script>
+</head>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    #full_screen{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        /* background-color: pink; */
+    }
+    #map_layer{
+        width: 100%;
+        height: 100%;
+    }
+    .left_lab{
+        position: absolute;
+        width: 300px;
+        height: 100%;
+        background-color: rgba(9, 188, 243,.1);
+        z-index: 2;
+    }
+    .right_lab{
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 300px;
+        height: 100%;
+        background-color: rgba(9, 188, 243,.1);
+        z-index: 2;
+    }
+    .left_arrow{
+        position: absolute;
+        border: transparent !important;
+        color: white !important;
+        background-color: rgba(255, 255, 255,.2) !important;
+        right: 0;
+        top: 50%;
+    }
+    .right_arrow{
+        position: absolute;
+        border: transparent !important;
+        color: white !important;
+        background-color: rgba(255, 255, 255,.2) !important;
+        left: 0;
+        top: 50%;
+    }
+    .layer{
+        margin-top: 20px;
+        margin-left: 5px;
+    }
+    /* 图层维度控制 */
+    .layer_control{
+        background-color: rgba(9, 188, 243,.1);
+        width: 80px;
+    }
+    .layer_btn{
+        color: white !important;
+        border: transparent !important;
+        background-color: rgba(9, 188, 243,.2) !important;
+        width: 100%;
+    }
+    .drop_layer{
+        text-align: center;
+        cursor: pointer;
+        color: white;
+        background-color: rgba(9, 188, 243,.2);
+        min-width: 100%
+    }
+    /* 基础图层控制 */
+
+    /* 底部时间轴 */
+    .bottom_axis{
+        width: 750px;
+        height: 50px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(9, 188, 243,.2);
+        
+    }
+    .time_line{
+        width: 600px;
+        height: 5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        background-color: rgba(240, 146, 4,.5);
+    }
+    .circle{
+        background-color: salmon;
+        border-radius: 20px;
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        top: -150%;
+        cursor: pointer;
+    }
+    .plot{
+        width: 260px;
+        height: 150px;
+        margin: 20px;
+        background-color: rgba(9, 188, 243,.2);
+    }
+    .title{
+        display: block;
+        width: 100%;
+        height: 25px;
+        color: white;
+        text-align: center;
+    }
+    .plot_circle{
+        float: left;
+        cursor: pointer;
+        margin: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        background-color: rgba(12, 208, 243, 0.6);
+    }
+    .plot_rect{
+        float: left;
+        cursor: pointer;
+        margin: 10px;
+        width: 50px;
+        height: 50px;
+        background-color: rgba(12, 208, 243, 0.6);
+    }
+    .plot_ploy{
+            float: left;
+            cursor: pointer;
+            margin: 10px;
+            margin-bottom: 0;
+            transform: translateY(-20px);
+            height: 50px;
+            border-style: solid;
+            border-width: 25px 25px 45px 25px;
+            border-color: transparent transparent rgba(12, 208, 243, 0.6);
+            width: 80px;
+    }
+    #color-picker{
+        margin: 20px;
+        width: 200px;
+        height: 20px;
+        float: left;
+        background-color: rgba(14, 253, 54, 0.6);
+    }
+    .save_area{
+        width: 260px;
+        height: 450px;
+        margin: 20px;
+        background-color: rgba(9, 188, 243,.2);
+    }
+    .user_save{
+        margin-top: 10px;
+        margin-left: 50px;
+        float: left;
+        color: white;
+        height: 20px;
+        background-color: violet;
+    }
+    .region_save{
+        margin-top: 10px;
+        margin-left: 20px;
+        float: left;
+        color:white;
+        background-color: violet;
+        width: 78px;
+    }
+    .save_box{
+        margin-left: 20px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: block;
+        float: left;
+        width: 40px;
+        height: 40px;
+        background-color: turquoise;
+    }
+    .current_plot{
+        color: white;
+        margin-left: 20px;
+        float: left;
+        width: 220px;
+        height: 150px;
+        background-color: rgba(9, 188, 243,.2);
+    }
+</style>
+<body>
+    <div id="full_screen">
+        <!-- 左侧 -->
+        <div class="left_lab">
+            <button type="button" class="btn btn-default left_arrow">></button>
+        </div>
+        <!-- 地图 -->
+        <div id="map_layer"></div>
+        <!-- 底部时间轴 -->
+        <div class="bottom_axis" style="color: white;">时间轴
+            <div class="time_line">
+                <div class="circle"></div>
+            </div>
+        </div>
+        <!-- 右侧 -->
+        <div class="right_lab">
+            <div class="layer">
+                <!-- 图层控制 -->
+                <div class="btn-group layer_control">
+                    <button class="btn btn-default btn-sm dropdown-toggle layer_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      图层控制<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu drop_layer">
+                      <li>2d</li>
+                      <li>2.5d</li>
+                      <li>3d</li>
+                    </ul>
+                </div>
+                <!-- 图层控制 -->
+
+                <!-- 基础图层控制 -->
+                <div class="btn-group basic_layer_control">
+                    <button class="btn btn-default btn-sm dropdown-toggle layer_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      基础图层控制<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu drop_layer">
+                      <li>标准图层</li>
+                      <li>实时路况</li>
+                      <li>卫星图层</li>
+                      <li>路网图层</li>
+                      <li>楼块图层</li>
+                    </ul>
+                </div>
+                <!-- 逻辑图层控制 -->
+                <div class="btn-group basic_layer_control">
+                    <button class="btn btn-default btn-sm dropdown-toggle layer_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      逻辑图层控制<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu drop_layer">
+                      <li>航线图</li>
+                      <li>街道流动图</li>
+                      <li>路径贴图</li>
+                      <li>轨迹动画</li>
+                      <li>3D柱状地图</li>
+                    </ul>
+                </div>
+                <!-- 逻辑图层控制 -->
+                
+                <!-- 绘制区域 -->
+                <div class="plot">
+                    <span class='title'>自定义区域绘制</span>
+                    <div class="plot_circle"></div>
+                    <div class="plot_rect"></div>
+                    <div class="plot_ploy"></div>
+                    <div id="color-picker" style="color:white">拾色器</div>
+                </div>
+
+                <!-- 区域存储 -->
+                <div class="save_area" style="color: white;">已存储区域 自定义区域和行政区域可切换
+                    <div class='area_lab'>
+                        <div class="user_save">自定义区域</div>
+                        <div class="region_save">行政区域   </div>
+                    </div>
+                    <!-- 已存储区域 -->
+                    <div class="save_plot">
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                        <span class="save_box"></span>
+                    </div>
+                    <!-- 当前选区 --> 
+                    <div class="current_plot">选区缩略图 &nbsp;&nbsp;&nbsp;&nbsp;距离/面积/高程显示</div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-default right_arrow"><</button>
+        </div>
+    <script>
+        var map = new AMap.Map('map_layer',{
+            mapStyle: 'amap://styles/darkblue',
+            zoom: 15
+        });
+        new Colorpicker({
+        el: "color-picker",
+        color: "#000fff",
+        change: function(elem, hex) {
+            console.log(elem, hex)
+        }
+    })
+    </script>
+</body>
+</html>

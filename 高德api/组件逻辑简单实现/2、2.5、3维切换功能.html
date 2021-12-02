@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0"></script>
+
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<style>
+    .box{
+        margin:0 auto;
+        position: absolute;
+        margin-top:100px
+    }
+    #mapLayer {
+        width: 500px;
+        height: 500px;
+        /* background-color: aqua; */
+    }
+    .box{
+        width: 500px;
+        height: 500px;
+        position: relative;
+    }
+    .dropdown{
+        position: absolute;
+        right: 0px;
+        top: 0;
+        z-index: 9999;
+    }
+    .dropdown-menu{
+        width: 100%;
+        min-width: 50px;
+    }
+    .map-btn{
+        width: 100%;
+    }
+</style>
+
+<body>
+    <div class="box">
+        <div id="mapLayer">
+        </div>
+        <div class="dropdown">
+            <button id="dLabel" type="button" class="btn btn-primary " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              图层切换
+              <!-- <span class="caret"></span> -->
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                <button type="button" class="btn map-btn btn-default " id="map2d">2D</button>
+                <button type="button" class="btn map-btn btn-default " id="map25d">2.5D</button>
+                <button type="button" class="btn map-btn btn-default " id="map3d">3D</button>
+            </ul> 
+          </div>
+    </div>
+    
+    
+    
+    
+    <script>
+        var map2d = document.getElementById('map2d')
+        var map25d = document.getElementById('map25d')
+        var map3d = document.getElementById('map3d')
+
+        var map = new AMap.Map('mapLayer', {
+            // zooms: [3, 20],
+            zoom: 17,
+            center: [116.333926, 39.997245]
+        })
+        map2d.addEventListener('click', () => {
+            var map = new AMap.Map('mapLayer', {
+                zoom: 17,
+                center: [116.333926, 39.997245]
+            })
+
+        })
+        map25d.addEventListener('click', () => {
+            var map = new AMap.Map('mapLayer', {
+                resizeEnable: true,
+                rotateEnable: false,
+                pitchEnable: false,
+                zoom: 17,
+                pitch: 65,
+                rotation: 45,
+                viewMode: '3D',//开启3D视图,默认为关闭
+                expandZoomRange: true,
+                zooms: [3, 20],
+                center: [116.333926, 39.997245]
+            });
+        })
+        map3d.addEventListener('click', () => {
+            var map = new AMap.Map('mapLayer', {
+                pitch: 75, // 地图俯仰角度，有效范围 0 度- 83 度
+                viewMode: '3D', // 地图模式
+                zoom: 18,
+                center: [116.333926, 39.997245]
+            });
+        })
+    </script>
+</body>
+
+</html>

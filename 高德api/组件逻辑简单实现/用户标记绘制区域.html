@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <title>Document</title>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=20f82c7a86e45f5da26e815931a775d0&plugin=AMap.MouseTool"></script> 
+    <style>
+        
+        #container {
+            width: 50%;
+            height: 50vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <button id="draw">绘制矩形</button>
+    <button id="clear">删除选区</button>
+    <button id='getID'>获取选取id</button>
+    <script>
+        const clearBtn = document.querySelector('#clear')
+        const drawBtn = document.querySelector('#draw')
+        const getID = document.querySelector('#getID')
+
+        clearBtn.addEventListener('click',clear)
+        drawBtn.addEventListener('click',draw)
+        getID.addEventListener('click',getRect)
+        var map = new AMap.Map('container',{
+            zoom:14
+        });
+        var mouseTool = new AMap.MouseTool(map);
+        
+        // 这个数组里面存的是 矩形的信息
+        var overlays = [];
+        var RectID = 0
+        //监听draw事件可获取画好的覆盖物 这个draw 是高德自带的一个事件 差不多就是鼠标连按的那种感觉
+        // 每次画图 都会重新调用draw()用来给选区标记ID
+        mouseTool.on('draw', function (e) {
+            console.log(overlays);
+            console.log(RectID);
+            RectID+=1;
+            draw(RectID)
+            overlays.push(e.obj);
+        })
+        mouseTool.on('click',function(){
+            console.log(this);
+        })
+        function clear() {
+            map.remove(overlays);
+            overlays=[]
+        }
+        // 这个函数是一直启动的
+        function draw(ID) {
+            ID=RectID
+            mouseTool.rectangle({
+                fillColor: 'red',
+                strokeColor: '#black',
+                extData:{
+                    id:ID
+                }   //同Polygon的Option设置
+            });
+        }
+
+        function getRect(){
+            console.log(mouseTool);
+            for(var i = 0; i < overlays.length; i++){
+            // 获取存在每个 extData 中的 id
+            var id = overlays[i].getExtData().id;
+            console.log(id);
+            }
+        }
+
+    </script>
+</body>
+
+</html>
